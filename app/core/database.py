@@ -2,7 +2,8 @@ import os
 import urllib.parse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import Base
+from app.auth.models.user import Base as AuthBase
+from app.blog.models.blog import Base as BlogBase
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,4 +24,5 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
-    Base.metadata.create_all(bind=engine) 
+    AuthBase.metadata.create_all(bind=engine)
+    BlogBase.metadata.create_all(bind=engine) 
