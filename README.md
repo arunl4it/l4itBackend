@@ -1,4 +1,4 @@
-# FastAPI Authentication & Blog Example
+# L4IT Backend
 
 This project demonstrates a simple authentication and blog system using FastAPI, SQLAlchemy, JWT, and file uploads.
 
