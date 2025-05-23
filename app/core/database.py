@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from app.auth.models.user import Base as AuthBase
 from app.blog.models.blog import Base as BlogBase
 from dotenv import load_dotenv
+from app.core.base import Base
 
 load_dotenv()
 
@@ -24,5 +25,4 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():
-    AuthBase.metadata.create_all(bind=engine)
-    BlogBase.metadata.create_all(bind=engine) 
+    Base.metadata.create_all(bind=engine) 

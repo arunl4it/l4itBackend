@@ -10,12 +10,13 @@ class BlogBase(BaseModel):
     meta_description: Optional[str] = None
 
 class BlogCreate(BlogBase):
-    pass
+    user_id: int
 
 class BlogUpdate(BlogBase):
-    pass
+    user_id: int
 
 class BlogOut(BlogBase):
     id: int
+    user_id: int
 
     model_config = ConfigDict(from_attributes=True)

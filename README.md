@@ -6,6 +6,8 @@ This project demonstrates a simple authentication and blog system using FastAPI,
 - Register and login with email and password (email must end with @l4it.net)
 - JWT-based authentication
 - Blog CRUD (create, read, update, delete)
+- Only the creator of a blog can update or delete it
+- Only authenticated users can access their own blogs via `/blog/user/{user_id}`
 - Image upload for blogs (jpg, png, gif, webp)
 - CORS enabled for frontend integration
 
@@ -61,8 +63,9 @@ This project demonstrates a simple authentication and blog system using FastAPI,
 - `POST /blog/` — Create a blog (requires token)
 - `GET /blog/` — List all blogs
 - `GET /blog/{blog_id}` — Get a single blog
-- `PUT /blog/{blog_id}` — Update a blog (requires token)
-- `DELETE /blog/{blog_id}` — Delete a blog (requires token)
+- `PUT /blog/{blog_id}` — Update a blog (requires token, only by creator)
+- `DELETE /blog/{blog_id}` — Delete a blog (requires token, only by creator)
+- `GET /blog/user/{user_id}` — Get all blogs by a user (requires token, only for self)
 
 ### Blog Create/Update Example (Postman)
 - **Method:** POST or PUT

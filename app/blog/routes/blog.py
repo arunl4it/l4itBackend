@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core.database import SessionLocal
 from app.blog.schemas.blog import BlogCreate, BlogUpdate, BlogOut
-from app.blog.crud import create_blog, get_blog, get_blogs, update_blog, delete_blog
+from app.blog.crud import create_blog, get_blog, get_blogs, update_blog, delete_blog, get_blogs_by_user
 import os
 import shutil
 from app.auth.dependencies import get_current_user
@@ -48,7 +48,8 @@ async def create(
         content=content,
         meta_title=meta_title,
         meta_description=meta_description,
-        image=image_path
+        image=image_path,
+        user_id=current_user.id
     )
     return create_blog(db, blog_data)
 
@@ -75,6 +76,11 @@ async def update(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    blog = get_blog(db, blog_id)
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    if blog.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this blog.")
     image_path = None
     if image:
         if image.content_type not in ALLOWED_IMAGE_TYPES:
@@ -89,16 +95,24 @@ async def update(
         content=content,
         meta_title=meta_title,
         meta_description=meta_description,
-        image=image_path
+        image=image_path,
+        user_id=current_user.id
     )
     updated = update_blog(db, blog_id, blog_data)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Blog not found")
     return updated
 
 @router.delete("/{blog_id}", status_code=status.HTTP_200_OK)
 def delete(blog_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    success = delete_blog(db, blog_id)
-    if not success:
+    blog = get_blog(db, blog_id)
+    if not blog:
         raise HTTPException(status_code=404, detail="Blog not found")
-    return JSONResponse(content={"detail": "Blog deleted successfully."}, status_code=200) 
+    if blog.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this blog.")
+    success = delete_blog(db, blog_id)
+    return JSONResponse(content={"detail": "Blog deleted successfully."}, status_code=200)
+
+@router.get("/user/{user_id}", response_model=List[BlogOut])
+def get_blogs_by_user_route(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view these blogs.")
+    return get_blogs_by_user(db, user_id) 

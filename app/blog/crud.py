@@ -16,6 +16,9 @@ def get_blog(db: Session, blog_id: int) -> Optional[Blog]:
 def get_blogs(db: Session, skip: int = 0, limit: int = 10) -> List[Blog]:
     return db.query(Blog).offset(skip).limit(limit).all()
 
+def get_blogs_by_user(db: Session, user_id: int) -> List[Blog]:
+    return db.query(Blog).filter(Blog.user_id == user_id).all()
+
 def update_blog(db: Session, blog_id: int, blog: BlogUpdate) -> Optional[Blog]:
     db_blog = db.query(Blog).filter(Blog.id == blog_id).first()
     if not db_blog:
